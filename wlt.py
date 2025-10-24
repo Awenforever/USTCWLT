@@ -49,6 +49,8 @@ class Observable:
         self._new_v = f'_{self.name}_v'
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         return instance.__dict__[self._new_v]
 
     def __set__(self, instance, value):
@@ -57,13 +59,12 @@ class Observable:
 
         if not hasattr(instance, self._old_v):
             setattr(instance, self._old_v, None)
-        else:
-            if not hasattr(instance, self._new_v):
-                setattr(instance, self._new_v, value)
-            else:
-                instance.__dict__[self._old_v], instance.__dict__[self._new_v] = (
-                    instance.__dict__[self._new_v], value
-                )
+        if not hasattr(instance, self._new_v):
+            setattr(instance, self._new_v, value)
+        if hasattr(instance, self._old_v) and hasattr(instance, self._new_v):
+            instance.__dict__[self._old_v], instance.__dict__[self._new_v] = (
+                instance.__dict__[self._new_v], value
+            )
         if instance.__dict__[self._old_v] != instance.__dict__[self._new_v]:
             assert self._observer is not None, \
                 f'Set Observer before assigning value to `{self.name}` with method `add_observer`.'
@@ -74,9 +75,11 @@ class Observable:
 
 class Wlt:
     DRIVER_PATH = r'C:\Program Files (x86)\Microsoft\EdgeWebDriver\msedgedriver.exe'
+    connection = Observable(bool)  # class property
+
     def __init__(self, timeout: int = 10):
-        self.connection = Observable(bool)
-        self.connection.set_observer(self._on_changed_status)
+        Wlt.connection.set_observer(self._on_changed_status)
+        self.connection = False
         self.timeout = timeout
         self.temp_user_data_dir = tempfile.mkdtemp(prefix='edge_temp_profile_')
         self.options = Options()
