@@ -1,0 +1,15 @@
+[workspace]
+authors = ["ahuiforever <king_wedo@163.com>"]
+channels = ["conda-forge"]
+name = "wlt"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.10.*"
+rich = ">=14.2.0,<15"
+selenium = ">=4.37.0,<5"
+requests = ">=2.32.5,<3"
+python-dotenv = ">=1.1.1,<2"
