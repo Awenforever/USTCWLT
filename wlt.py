@@ -128,6 +128,7 @@ class Observable:
     def set_observer(self, observer: Callable):
         self._observer = observer
 
+
 class Wlt:
     DRIVER_PATH = Path(r'~\EdgeWebDriver\msedgedriver.exe').expanduser()
     connection = Observable(bool)  # class property
