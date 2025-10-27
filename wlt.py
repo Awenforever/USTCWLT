@@ -1,28 +1,29 @@
+# local
+import os
 import tempfile
 import time
-# reqyests
-import requests
-from requests.exceptions import ConnectionError
+from pathlib import Path
+from typing import Callable
+import zipfile
+import shutil
+import winreg
+import subprocess
+import urllib3
+# dotenv
+from dotenv import load_dotenv
 # rich
 from rich.progress import Console
 # selenium
 from selenium import webdriver
-# from selenium.webdriver.chromium.service import ChromiumService
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-# from selenium.common.exceptions import TimeoutException, NoSuchElementException
-from typing import Callable
-import urllib3
+from selenium.webdriver.support.ui import WebDriverWait
 from urllib3.exceptions import InsecureRequestWarning
 
-import os
-
-# dotenv
-from dotenv import load_dotenv
-
+# requests
+import requests
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -30,6 +31,59 @@ load_dotenv()
 NAME = os.getenv('APP_NAME')
 PASSWORD = os.getenv('APP_PASSWORD')
 console = Console()
+
+
+def is_driver_version_compatible(driver_path, edge_version):
+    try:
+        # 获取 WebDriver 的版本号
+        result = subprocess.run([driver_path, '--version'], capture_output=True, text=True)
+        driver_version = result.stdout.strip().split()[3]  # 提取版本号部分
+
+        # 比较前三段版本号
+        driver_parts = driver_version.split('.')[:3]
+        edge_parts = edge_version.split('.')[:3]
+
+        return driver_parts == edge_parts
+    except Exception as e:
+        print(f"错误：{e}")
+        return False
+
+
+def get_edge_version():
+    try:
+        reg_path = r"SOFTWARE\Microsoft\Edge\BLBeacon"
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, reg_path) as key:
+            version, _ = winreg.QueryValueEx(key, "version")
+            return version
+    except Exception as e:
+        print(f"Error retrieving Edge version: {e}")
+        return None
+
+
+def setup_edge_webdriver(version):
+    base_url = f"https://msedgedriver.microsoft.com/{version}/edgedriver_win64.zip"
+    zip_path = "edgedriver_win64.zip"
+    extract_dir = "extracted_driver"
+
+    print(f"Downloading from: {base_url}")
+    response = requests.get(base_url)
+    with open(zip_path, "wb") as f:
+        f.write(response.content)
+
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_dir)
+
+    target_dir = os.path.expanduser(r"~\EdgeWebDriver")
+    os.makedirs(target_dir, exist_ok=True)
+
+    for root, dirs, files in os.walk(extract_dir):
+        for file in files:
+            if file == "msedgedriver.exe":
+                shutil.move(os.path.join(root, file), os.path.join(target_dir, file))
+                print(f"msedgedriver.exe moved to {os.path.join(target_dir, file)}")
+                return
+
+    print("msedgedriver.exe not found in the extracted files.")
 
 
 class Observable:
@@ -75,7 +129,7 @@ class Observable:
         self._observer = observer
 
 class Wlt:
-    DRIVER_PATH = r'C:\Program Files (x86)\Microsoft\EdgeWebDriver\msedgedriver.exe'
+    DRIVER_PATH = Path(r'~\EdgeWebDriver\msedgedriver.exe').expanduser()
     connection = Observable(bool)  # class property
 
     def __init__(self, timeout: int = 10):
@@ -172,6 +226,14 @@ class Wlt:
 
 
 if __name__ == '__main__':
+    edge_version = get_edge_version()
+
+    if Wlt.DRIVER_PATH.exists():
+        if not is_driver_version_compatible(Wlt.DRIVER_PATH, edge_version):
+            setup_edge_webdriver(edge_version)
+    else:
+        setup_edge_webdriver(edge_version)
+
     wlt = Wlt(10)
     try:
         wlt.listening()
