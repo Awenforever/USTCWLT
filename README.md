@@ -15,5 +15,5 @@ python ./wlt.py
 ```
 # Auto run bat when system start up
 ```commandline
-timeout /t 30 /nobreak >nul && cd /d "E:\Pycharm Project\SpectralGPT\wlt" && python ./wlt.py
+timeout /t 30 /nobreak >nul && cd /d "your\path\to\wlt" && python ./wlt.py
 ```
