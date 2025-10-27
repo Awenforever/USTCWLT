@@ -2,3 +2,7 @@
 .pixi/*
 !.pixi/config.toml
 .env
+*.zip
+*driver
+*.sh
+*.png
