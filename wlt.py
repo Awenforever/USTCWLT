@@ -226,13 +226,13 @@ class Wlt:
 
 
 if __name__ == '__main__':
-    edge_version = get_edge_version()
+    e_version = get_edge_version()
 
     if Wlt.DRIVER_PATH.exists():
-        if not is_driver_version_compatible(Wlt.DRIVER_PATH, edge_version):
-            setup_edge_webdriver(edge_version)
+        if not is_driver_version_compatible(Wlt.DRIVER_PATH, e_version):
+            setup_edge_webdriver(e_version)
     else:
-        setup_edge_webdriver(edge_version)
+        setup_edge_webdriver(e_version)
 
     wlt = Wlt(10)
     try:
