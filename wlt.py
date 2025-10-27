@@ -19,6 +19,7 @@ import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
 import os
+
 # dotenv
 from dotenv import load_dotenv
 

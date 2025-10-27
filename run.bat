@@ -1,0 +1,1 @@
+timeout /t 30 /nobreak >nul && cd /d "E:\Pycharm Project\SpectralGPT\wlt" && pixi run wlt
