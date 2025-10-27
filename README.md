@@ -4,7 +4,7 @@ git clone https://github.com/Awenforever/USTCWLT.git && cd ./USTCWLT
 pip install -r requirements
 ```
 # Configuration
-Create `./.env` and fill in your username and password:
+Create file `./.env` and fill in your username and password:
 ```text
 APP_NAME=your_name
 APP_PASSWORD=your_password
