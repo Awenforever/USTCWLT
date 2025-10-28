@@ -157,6 +157,15 @@ class Wlt:
             'enable-logging'
         ])
 
+        self.options.add_argument('--allow-running-insecure-content')
+        self.options.add_argument('--ignore-certificate-errors')
+
+        # 禁用自动HTTPS升级
+        self.options.add_experimental_option('prefs', {
+            'profile.default_content_setting_values.insecure_ssl': 1,
+            'profile.managed_default_content_settings.images': 1
+        })
+
         # 无头模式配置
         # self.options.add_argument('--headless')
         # self.options.add_argument('--disable-gpu')
@@ -173,7 +182,7 @@ class Wlt:
     def _reconnect(self):
         service = Service(executable_path=self.DRIVER_PATH)
         with webdriver.ChromiumEdge(service=service, options=self.options) as driver:
-            driver.get('http://wlt.ustc.edu.cn/cgi-bin/ip')
+            driver.get('http://wlt.ustc.edu.cn/')
             wait = WebDriverWait(driver, 30)
             # ele_name = driver.find_element(By.NAME, 'name')
             # ele_password = driver.find_element(By.NAME, 'password')
@@ -190,7 +199,7 @@ class Wlt:
         console.log('Start listening...')
         while True:
             self.connection = self._network_connectivity_test()
-            if not self.connection:
+            if self.connection:
                 console.log('Reconnecting ...')
                 try:
                     self._reconnect()

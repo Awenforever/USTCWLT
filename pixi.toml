@@ -4,6 +4,8 @@ channels = ["conda-forge"]
 name = "wlt"
 platforms = ["win-64"]
 version = "0.1.0"
+readme = "README.md"
+repository = "https://github.com/Awenforever/USTCWLT.git"
 
 [tasks]
 wlt = 'python .\wlt.py'
