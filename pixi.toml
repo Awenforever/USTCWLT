@@ -1,5 +1,5 @@
 [workspace]
-authors = ["ahuiforever <king_wedo@163.com>"]
+authors = ["Awenforever <king_wedo@163.com>"]
 channels = ["conda-forge"]
 name = "wlt"
 platforms = ["win-64"]
