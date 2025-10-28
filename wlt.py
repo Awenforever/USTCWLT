@@ -199,7 +199,7 @@ class Wlt:
         console.log('Start listening...')
         while True:
             self.connection = self._network_connectivity_test()
-            if self.connection:
+            if not self.connection:
                 console.log('Reconnecting ...')
                 try:
                     self._reconnect()
